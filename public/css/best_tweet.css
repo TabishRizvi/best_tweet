@@ -1,0 +1,41 @@
+@font-face {
+    font-family: 'Avenir-Light';
+    src: url('/fonts/Avenir-Light.ttf') format('truetype');
+}
+
+@font-face {
+    font-family: 'Avenir-Book';
+    src: url('/fonts/Avenir-Book.ttf') format('truetype');
+}
+
+#home-header{
+    height : 30vh;
+    padding: 2em 0 2em 0;
+    background: linear-gradient(rgba(0,0,0,0.1),rgba(0,0,0,0.1)) ,url('/images/bg.jpg') no-repeat center center fixed;
+    -webkit-background-size: cover;
+    -moz-background-size: cover;
+    -o-background-size: cover;
+    background-size: cover;
+}
+
+.home-heading{
+    font-family: 'Avenir-Book';
+    font-size: 50px;
+    width: 246px;
+    height:62px;
+    position: relative;
+    margin-left: -123px;
+    margin-top : -31px;
+    top:50%;
+    left:50%;
+}
+
+.custom-panel{
+    min-height : 50vh;
+
+    margin: 2em 0 2em 0;
+}
+
+#error-div{
+    display: none;
+}

@@ -1,0 +1,60 @@
+<script>
+
+    function validate(event){
+
+
+        $("#error-div").css("display","none");
+
+        var userName = $("#user-name").val();
+        var userId = $("#user-id").val();
+
+        console.log("userName",userName==""?"blank":userName);
+        console.log("userId",userId==""?"blank":userId);
+
+        if(! (userName=="" ^ userId=="")){
+            $("#error-message").text("Enter valid parameters.")
+            $("#error-div").css("display","inherit");
+            event.preventDefault();
+
+
+        }
+    }
+
+
+</script>
+
+<div id="home-header">
+    <p class="home-heading ">Best Tweet</p>
+</div>
+
+<div class="container">
+
+    <div class="row">
+        <div class="col-xs-offset-2 col-xs-8">
+
+            <div class="well well-lg custom-panel">
+                <h2>Please enter user name or user ID of the twitter user</h2>
+                <form onsubmit="validate(event)" method="get" action="/web/best-time">
+                    <div class="form-group">
+                        <label for="user-name">User name</label>
+                        <input type="text" class="form-control" id="user-name" name="userName" placeholder="User name">
+                    </div>
+                    <div class="form-group">
+                        <label for="user-id">User id</label>
+                        <input type="text" class="form-control" id="user-id" name="userId" placeholder="User ID">
+                    </div>
+
+                    <div class="alert alert-danger" id="error-div" role="alert">
+                        <p id="error-message"></p>
+                    </div>
+
+                    <button type="submit" class="btn btn-default">Submit</button>
+                </form>
+            </div>
+
+
+
+        </div>
+    </div>
+
+</div>

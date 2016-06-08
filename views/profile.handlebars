@@ -1,0 +1,61 @@
+<script>
+    $( document ).ready(function() {
+
+        var payload = {
+            credentialType : $("#credentialType").val(),
+            credential : $("#credential").val()
+        };
+
+
+        $("#profile-link").attr("href", "/web/profile?credentialType="+payload.credentialType+"&credential="+payload.credential);
+
+
+        $.ajax({
+            url : "/api/fetch-data",
+            method : "post",
+            data : JSON.stringify(payload),
+            contentType : "application/json",
+            success : function(){
+                console.log("success",arguments);
+            },
+            error : function(){
+                console.log("error",arguments);
+
+            },
+            complete : function(){
+                console.log("complete",arguments);
+
+            }
+        });
+    });
+</script>
+
+<div id="home-header">
+    <p class="home-heading ">Best Tweet</p>
+</div>
+
+<div class="container">
+
+    <div class="row">
+        <div class="col-xs-offset-2 col-xs-8">
+
+            <div class="well well-lg custom-panel">
+
+                <a class="btn btn-danger" id="best-time-link">View Profile</a>
+                <a class="btn btn-danger" href="/web/home">Go back Home</a>
+                <h2>Please wait loading results ...</h2>
+
+            </div>
+
+
+
+
+        </div>
+    </div>
+
+</div>
+
+<form>
+    <input type="hidden" id="credentialType" value="{{credentialType}}">
+    <input type="hidden" id="credential" value="{{credential}}">
+</form>
