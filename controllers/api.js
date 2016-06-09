@@ -110,16 +110,23 @@ module.exports.FetchDataCtrl = function(req,res,next){
         function(cb){
 
             dataObject.timeSlots ={};
+            dataObject.daySlots ={};
 
             _.each(_.range(24),function(element){
                 dataObject.timeSlots[element] =0;
             });
+
+            _.each(_.range(7),function(element){
+                dataObject.daySlots[element] =0;
+            });
+
 
             _.each(dataObject.list,function(element){
 
                 if(element.status!=undefined){
                     var tweetDate = moment(element.status.created_at,"ddd MMM DD HH:mm:ss Z YYYY").utcOffset(dataObject.offset);
                     dataObject.timeSlots[parseInt(tweetDate.format("H"))]++;
+                    dataObject.daySlots[parseInt(tweetDate.format("d"))]++;
 
                 }
 
@@ -128,7 +135,7 @@ module.exports.FetchDataCtrl = function(req,res,next){
             var max = -1;
             var maxHour = -1;
 
-            _.each(dataObject.timeSlots,function(element,key,list){
+            _.each(dataObject.timeSlots,function(element,key){
 
                 if(element>max){
                     max = element;
@@ -137,13 +144,23 @@ module.exports.FetchDataCtrl = function(req,res,next){
             });
 
 
+            max = -1;
+            var maxDay = -1;
 
-            var reponse = {
-                time_slot : dataObject.timeSlots,
-                max_hour : lib.utils.getMeridianTime(maxHour)
+            _.each(dataObject.daySlots,function(element,key){
+
+                if(element>max){
+                    max = element;
+                    maxDay = parseInt(key);
+                }
+            });
+
+            var response = {
+                max_hour : lib.utils.getMeridianTime(maxHour),
+                max_day : lib.utils.getDayName(maxDay)
             };
 
-            cb(null,reponse);
+            cb(null,response);
         }
     ],function(err,result){
 
@@ -171,25 +188,29 @@ module.exports.FetchDataCtrl = function(req,res,next){
 
 module.exports.FetchProfileCtrl = function(req,res,next){
 
-    var payload = req.body;
+
+    var context = req.originalUrl;
+
+    var dataObject = req.body;
+
     var schema = Joi.object().keys({
-        credentialType: Joi.string().required().valid("userName","userId"),
+        credentialType: Joi.string().required().valid("screen_name","user_id"),
         credential : Joi.string().required()
 
     });
 
 
+
     async.waterfall([
         function(cb){
-            Joi.validate(payload,schema,{},function(err,result){
+            Joi.validate(dataObject,schema,{},function(err){
 
                 if(err){
-
+                    lib.logging.logError(context,err);
                     cb({status :400});
                 }
 
                 else{
-
                     cb(null);
                 }
             });
@@ -197,32 +218,39 @@ module.exports.FetchProfileCtrl = function(req,res,next){
 
         function(cb){
 
-            var bearerTokenCredentials = lib.utils.getBearerTokenCredentials();
-
-            var options = {
-                method: 'POST',
-                url: 'https://api.twitter.com/oauth2/token',
-                qs: {
-                    origins: origins.join("|"),
-                    destinations: destinations.join("|"),
-                    mode: "driving",
-                    units: "metric",
-                    language: "en",
-                    avoid: "",
-                    client: client,
-                    signature: signature
+            lib.twitter.getTwitterAccessToken(function(err,accessToken){
+                if(err){
+                    lib.logging.logError(context,err);
+                    cb({status:500});
                 }
-            };
+                else{
+                    dataObject.accessToken = accessToken;
+                    cb(null);
+                }
+            });
+        },
 
 
-            cb(null,{});
+        function(cb){
+
+
+            lib.twitter.getUserProfile(dataObject.accessToken,dataObject.credentialType,dataObject.credential,function(err,profile){
+                if(err){
+                    lib.logging.logError(context,err);
+                    cb({status:500});
+                }
+                else{
+                    cb(null,profile);
+                }
+            });
+
         }
     ],function(err,result){
 
         if(err){
             res.status(err.status).send({
                 message :lib.utils.getErrorMessage(err.status),
-                status : 200,
+                status : err.status,
                 data : result
             });
         }
@@ -234,5 +262,10 @@ module.exports.FetchProfileCtrl = function(req,res,next){
             })
         }
     });
+
+
+
+
 };
+
 

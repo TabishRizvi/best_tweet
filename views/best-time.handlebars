@@ -29,6 +29,27 @@
 
             }
         });
+
+        $.ajax({
+            url : "/api/fetch-profile",
+            method : "post",
+            data : JSON.stringify({
+                credentialType : credentialType,
+                credential : credential
+            }),
+            contentType : "application/json",
+            success : function(){
+                console.log("success",arguments);
+            },
+            error : function(){
+                console.log("error",arguments);
+
+            },
+            complete : function(){
+                console.log("complete",arguments);
+
+            }
+        });
     });
 </script>
 
