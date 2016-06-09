@@ -1,24 +1,31 @@
 <script>
 
-    function validate(event){
+
+    $( document ).ready(function() {
+
+        $("#form1").submit(function(event){
+
+            $("#error-div").css("display","none");
+
+            var screenName = $("#screen-name").val();
+            var userId = $("#user-id").val();
 
 
-        $("#error-div").css("display","none");
+            if(! (screenName=="" ^ userId=="")){
+                $("#error-message").text("Enter valid parameters.")
+                $("#error-div").css("display","inherit");
+                event.preventDefault();
+                return;
+            }
 
-        var userName = $("#user-name").val();
-        var userId = $("#user-id").val();
+            var credentialType = userId==""?"screen_name":"user_id";
+            var credential = userId==""?screenName:userId;
 
-        console.log("userName",userName==""?"blank":userName);
-        console.log("userId",userId==""?"blank":userId);
+            $("#form1").append("<input type='hidden' name='credentialType' value='"+credentialType+"' />");
+            $("#form1").append("<input type='hidden' name='credential' value='"+credential+"' />");
 
-        if(! (userName=="" ^ userId=="")){
-            $("#error-message").text("Enter valid parameters.")
-            $("#error-div").css("display","inherit");
-            event.preventDefault();
-
-
-        }
-    }
+        });
+    });
 
 
 </script>
@@ -34,14 +41,14 @@
 
             <div class="well well-lg custom-panel">
                 <h2>Please enter user name or user ID of the twitter user</h2>
-                <form onsubmit="validate(event)" method="get" action="/web/best-time">
+                <form id="form1" method="get" action="/web/best-time">
                     <div class="form-group">
                         <label for="user-name">User name</label>
-                        <input type="text" class="form-control" id="user-name" name="userName" placeholder="User name">
+                        <input type="text" class="form-control" id="screen-name"  placeholder="User name">
                     </div>
                     <div class="form-group">
                         <label for="user-id">User id</label>
-                        <input type="text" class="form-control" id="user-id" name="userId" placeholder="User ID">
+                        <input type="text" class="form-control" id="user-id"  placeholder="User ID">
                     </div>
 
                     <div class="alert alert-danger" id="error-div" role="alert">

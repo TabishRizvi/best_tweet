@@ -40,8 +40,17 @@ app.use(express.static(path.join(__dirname, 'public')));
 
 app.use('/web', routes.web);
 app.use('/api', routes.api);
-app.get("/",function(req,res,next){
+
+app.get("/",function(req,res){
     res.redirect("/web/home");
+});
+
+app.get("/favicon.ico",function(req,res){
+
+    res.set('Content-Type', 'image/x-icon');
+
+    res.status(200).end();
+
 });
 
 

@@ -1,19 +1,21 @@
 <script>
     $( document ).ready(function() {
 
-        var payload = {
-            credentialType : $("#credentialType").val(),
-            credential : $("#credential").val()
-        };
+        var credentialType = "{{credentialType}}";
+        var credential = "{{credential}}";
 
 
-        $("#profile-link").attr("href", "/web/profile?credentialType="+payload.credentialType+"&credential="+payload.credential);
+
+        $("#best-time-link").attr("href", "/web/best-time?credentialType="+credentialType+"&credential="+credential);
 
 
         $.ajax({
-            url : "/api/fetch-data",
+            url : "/api/fetch-profile",
             method : "post",
-            data : JSON.stringify(payload),
+            data : JSON.stringify({
+                credentialType : credentialType,
+                credential : credential
+            }),
             contentType : "application/json",
             success : function(){
                 console.log("success",arguments);
@@ -41,7 +43,7 @@
 
             <div class="well well-lg custom-panel">
 
-                <a class="btn btn-danger" id="best-time-link">View Profile</a>
+                <a class="btn btn-danger" id="best-time-link">Best time to tweet</a>
                 <a class="btn btn-danger" href="/web/home">Go back Home</a>
                 <h2>Please wait loading results ...</h2>
 
@@ -54,8 +56,3 @@
     </div>
 
 </div>
-
-<form>
-    <input type="hidden" id="credentialType" value="{{credentialType}}">
-    <input type="hidden" id="credential" value="{{credential}}">
-</form>

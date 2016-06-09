@@ -1,19 +1,21 @@
 <script>
     $( document ).ready(function() {
 
-        var payload = {
-            credentialType : $("#credentialType").val(),
-            credential : $("#credential").val()
-        };
+        var credentialType = "{{credentialType}}";
+        var credential = "{{credential}}";
 
 
-        $("#profile-link").attr("href", "/web/profile?credentialType="+payload.credentialType+"&credential="+payload.credential);
+        $("#profile-link").attr("href", "/web/profile?credentialType="+credentialType+"&credential="+credential);
 
 
         $.ajax({
             url : "/api/fetch-data",
             method : "post",
-            data : JSON.stringify(payload),
+            data : JSON.stringify({
+                credentialType : credentialType,
+                credential : credential,
+                offset : -(new Date()).getTimezoneOffset()
+            }),
             contentType : "application/json",
             success : function(){
                 console.log("success",arguments);
@@ -54,8 +56,3 @@
     </div>
 
 </div>
-
-<form>
-    <input type="hidden" id="credentialType" value="{{credentialType}}">
-    <input type="hidden" id="credential" value="{{credential}}">
-</form>
