@@ -20,14 +20,33 @@
             success : function(response,txtStatus){
 
                 var data = response.data;
+                var html = "<table><tbody><tr><th></th>";
+
+                var i,key;
+                for(key in data.week_wise_data.Sunday){
+                    html += "<th>"+key+"</th>";
+                }
+
+                html += "</tr>";
+
+                for(key in data.week_wise_data){
+
+                    html += "<tr><td>"+key+"</td>";
+
+                    for(var key1 in data.week_wise_data[key]){
+                        html += "<td>"+data.week_wise_data[key][key1]+"</td>";
+                    }
+
+                    html += "</tr>";
+
+                }
+
+                html +=  "</tbody></table>"
+
+                $("#best").html(html);
+                $("#best").css("display","inherit");
 
 
-                $("#profile-img").attr("src",data.profile_image_url);
-                $("#name").text(data.name);
-                $("#screen-name").text("@"+data.screen_name);
-
-                $("#loading").css("display","none");
-                $("#profile").css("display","inherit");
             },
             error : function(){
                 console.log("error",arguments);
@@ -51,23 +70,15 @@
 
                 var data = response.data;
 
-                var html = "<table><tbody><tr><th></th>";
-
-                var i,key;
-                for(key in Object.keys(data.week_wise_data.Sunday)){
-                    html += "<th>"+key+"</th>";
-                }
-
-                html += "</tr>";
-
-
-                for(i=0;i<data.week_max;i++){
-                    html += "<th>"
-                }
 
                 $("#profile-img").attr("src",data.profile_image_url);
                 $("#name").text(data.name);
                 $("#screen-name").text("@"+data.screen_name);
+
+                $("#loading").css("display","none");
+                $("#data").css("display","inherit");
+
+
 
             },
             error : function(){
@@ -89,7 +100,7 @@
 <div class="container">
 
     <div class="row">
-        <div class="col-xs-offset-2 col-xs-8">
+        <div class="col-xs-offset-1 col-xs-10">
 
             <div class="well well-lg custom-panel">
 
@@ -102,7 +113,7 @@
 
                     <h1 id="name"></h1>
                     <h3 id="screen-name"></h3>
-                    <h3 id="best"></h3>
+                    <div id="best"></div>
                 </div>
 
 
