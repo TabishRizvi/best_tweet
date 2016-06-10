@@ -17,8 +17,17 @@
                 offset : -(new Date()).getTimezoneOffset()
             }),
             contentType : "application/json",
-            success : function(){
-                console.log("success",arguments);
+            success : function(response,txtStatus){
+
+                var data = response.data;
+
+
+                $("#profile-img").attr("src",data.profile_image_url);
+                $("#name").text(data.name);
+                $("#screen-name").text("@"+data.screen_name);
+
+                $("#loading").css("display","none");
+                $("#profile").css("display","inherit");
             },
             error : function(){
                 console.log("error",arguments);
@@ -38,8 +47,28 @@
                 credential : credential
             }),
             contentType : "application/json",
-            success : function(){
-                console.log("success",arguments);
+            success : function(response,txtStatus){
+
+                var data = response.data;
+
+                var html = "<table><tbody><tr><th></th>";
+
+                var i,key;
+                for(key in Object.keys(data.week_wise_data.Sunday)){
+                    html += "<th>"+key+"</th>";
+                }
+
+                html += "</tr>";
+
+
+                for(i=0;i<data.week_max;i++){
+                    html += "<th>"
+                }
+
+                $("#profile-img").attr("src",data.profile_image_url);
+                $("#name").text(data.name);
+                $("#screen-name").text("@"+data.screen_name);
+
             },
             error : function(){
                 console.log("error",arguments);
@@ -66,7 +95,16 @@
 
                 <a class="btn btn-danger" id="profile-link">View Profile</a>
                 <a class="btn btn-danger" href="/web/home">Go back Home</a>
-                <h2>Please wait loading results ...</h2>
+                <h2 id="loading">Please wait loading results ...</h2>
+
+                <div id="data">
+                    <img class="img-rounded" id="profile-img" src="" >
+
+                    <h1 id="name"></h1>
+                    <h3 id="screen-name"></h3>
+                    <h3 id="best"></h3>
+                </div>
+
 
             </div>
 

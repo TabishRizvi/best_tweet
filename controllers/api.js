@@ -61,6 +61,10 @@ module.exports.FetchDataCtrl = function(req,res,next){
                     lib.logging.logError(context,err);
                     cb({status:500});
                 }
+                else if(list.length==0){
+                    lib.logging.logDebug(context,"No followers for "+dataObject.credential);
+                    cb({status : 404});
+                }
                 else{
                     dataObject.userIds = list;
                     dataObject.list = [];
@@ -109,58 +113,116 @@ module.exports.FetchDataCtrl = function(req,res,next){
 
         function(cb){
 
-            dataObject.timeSlots ={};
-            dataObject.daySlots ={};
 
-            _.each(_.range(24),function(element){
-                dataObject.timeSlots[element] =0;
-            });
+            dataObject.weekValues = [];
+            dataObject.allValues = [];
+            var i,j;
+            for(i=0;i<7;i++){
+                var temp = [];
+                for(j=0;j<24;j++){
+                    temp.push(0);
+                }
+                dataObject.weekValues.push(temp);
+            }
 
-            _.each(_.range(7),function(element){
-                dataObject.daySlots[element] =0;
-            });
+            for(i=0;i<24;i++){
+                dataObject.allValues.push(0);
+            }
 
 
             _.each(dataObject.list,function(element){
 
                 if(element.status!=undefined){
-                    var tweetDate = moment(element.status.created_at,"ddd MMM DD HH:mm:ss Z YYYY").utcOffset(dataObject.offset);
-                    dataObject.timeSlots[parseInt(tweetDate.format("H"))]++;
-                    dataObject.daySlots[parseInt(tweetDate.format("d"))]++;
+                    var tweetDate = moment.utc(element.status.created_at,"ddd MMM DD HH:mm:ss Z YYYY").utcOffset(dataObject.offset);
 
-                }
+                    dataObject.weekValues[parseInt(tweetDate.format("d"))][parseInt(tweetDate.format("H"))]++;
 
-            });
-
-            var max = -1;
-            var maxHour = -1;
-
-            _.each(dataObject.timeSlots,function(element,key){
-
-                if(element>max){
-                    max = element;
-                    maxHour = parseInt(key);
+                    dataObject.allValues[parseInt(tweetDate.format("H"))]++;
                 }
             });
 
 
-            max = -1;
-            var maxDay = -1;
+            cb(null);
+        },
 
-            _.each(dataObject.daySlots,function(element,key){
+        function(cb){
 
-                if(element>max){
-                    max = element;
-                    maxDay = parseInt(key);
+            dataObject.weekMaxTimes = {};
+            var i, j,max1,maxTime,change1;
+            var weekSum,max2,maxDay;
+
+            max2=-1;
+            maxDay=-1;
+
+
+            for(i=0;i<7;i++){
+
+                max1 = -1;
+                maxTime = -1;
+                weekSum =0;
+
+                for(j=0;j<24;j++){
+
+                    if(dataObject.weekValues[i][j]>max1){
+                        max1 = dataObject.weekValues[i][j];
+                        maxTime = j;
+                    }
+
+                    weekSum += dataObject.weekValues[i][j];
+
+                    if(weekSum>max2){
+                        max2 = weekSum;
+                        maxDay = i;
+                    }
                 }
-            });
+                dataObject.weekMaxTimes[lib.utils.getDayName(i)] =lib.utils.getMeridianTime(maxTime);
+            }
+
+            dataObject.maxDay = lib.utils.getDayName(maxDay);
+
+
+            max1 = -1;
+            maxTime = -1;
+            for(i=0;i<24;i++){
+                if(dataObject.allValues[i]>max1){
+                    max1 = dataObject.allValues[i];
+                    maxTime = i;
+                }
+            }
+
+            dataObject.allMaxTime = lib.utils.getMeridianTime(maxTime);
+
+
+
+
+            cb(null);
+
+        },
+
+        function(cb){
+
+
+            var i, j;
+            dataObject.weekWiseData ={};
+            for(i=0;i<7;i++){
+                dataObject.weekWiseData[lib.utils.getDayName(i)] ={};
+                for(j=0;j<24;j++){
+                    dataObject.weekWiseData[lib.utils.getDayName(i)][lib.utils.getMeridianTime(j)] = dataObject.weekValues[i][j];
+                }
+            }
 
             var response = {
-                max_hour : lib.utils.getMeridianTime(maxHour),
-                max_day : lib.utils.getDayName(maxDay)
+                week_max_times : dataObject.weekMaxTimes,
+                all_max_time :dataObject.allMaxTime,
+                max_day : dataObject.maxDay,
+                week_wise_data : dataObject.weekWiseData,
+                test_data : dataObject.list,
+                test_data1 : dataObject.allValues
+
             };
 
             cb(null,response);
+
         }
     ],function(err,result){
 

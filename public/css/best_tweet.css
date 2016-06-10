@@ -36,6 +36,6 @@
     margin: 2em 0 2em 0;
 }
 
-#error-div{
+#error-div,#profile,#data,#best{
     display: none;
 }

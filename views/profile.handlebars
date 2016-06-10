@@ -17,8 +17,19 @@
                 credential : credential
             }),
             contentType : "application/json",
-            success : function(){
-                console.log("success",arguments);
+            success : function(response,txtStatus){
+
+                var data = response.data;
+
+                console.log(data.profile_image_url.replace("_normal",""))
+
+                $("#profile-img").attr("src",data.profile_image_url.replace("_normal",""));
+                $("#name").text(data.name);
+                $("#screen-name").text("@"+data.screen_name);
+                $("#stats").html("<span style='font-weight: bold'>Tweets: </span>"+data.statuses_count+" <span style='font-weight: bold'>Following: </span>"+data.friends_count+" <span style='font-weight: bold'>Followers: </span>"+data.followers_count+" <span style='font-weight: bold'>Likes: </span>"+data.favourites_count);
+
+                $("#loading").css("display","none");
+                $("#profile").css("display","inherit");
             },
             error : function(){
                 console.log("error",arguments);
@@ -45,7 +56,18 @@
 
                 <a class="btn btn-danger" id="best-time-link">Best time to tweet</a>
                 <a class="btn btn-danger" href="/web/home">Go back Home</a>
-                <h2>Please wait loading results ...</h2>
+
+
+                <h2 id="loading">Please wait loading results ...</h2>
+
+                <div id="profile">
+                    <img class="img-rounded" id="profile-img" src="" >
+
+                    <h1 id="name"></h1>
+                    <h3 id="screen-name"></h3>
+                    <h3 id="stats"></h3>
+                </div>
+
 
             </div>
 
