@@ -4,7 +4,7 @@
   "description": "Application to find best time and day to tweet",
   "main": "app.js",
   "bin": {
-    "productivity": "www.js"
+    "best_tweet": "www.js"
   },
   "scripts": {
     "start": "node bin/www"
@@ -20,7 +20,6 @@
     "joi": "^8.0.5",
     "moment": "^2.13.0",
     "morgan": "^1.7.0",
-    "node-redis": "^0.1.7",
     "request": "^2.72.0",
     "underscore": "^1.8.3"
   }

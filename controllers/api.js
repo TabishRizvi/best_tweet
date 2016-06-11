@@ -106,8 +106,6 @@ module.exports.FetchDataCtrl = function(req,res,next){
                 stringIds.push(tempArray.join(","));
             }
 
-            lib.logging.logDebug(context,stringIds);
-
             // Get user data for each chunk in parallel
             async.each(stringIds,function(element,callback){
 
@@ -340,7 +338,8 @@ module.exports.FetchProfileCtrl = function(req,res,next){
                     }
                 }
                 else{
-                    cb(null,profile);
+                    var response = _.pick(profile,["name","screen_name","profile_image_url","profile_image_url_https","statuses_count","friends_count","followers_count","favourites_count"]);
+                    cb(null,response);
                 }
             });
 
