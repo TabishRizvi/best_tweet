@@ -8,7 +8,7 @@
         $("#profile-link").attr("href", "/web/profile?credentialType="+credentialType+"&credential="+credential);
 
 
-        $.ajax({
+        var fetchDataRequest =$.ajax({
             url : "/api/fetch-data",
             method : "post",
             data : JSON.stringify({
@@ -20,9 +20,11 @@
             success : function(response,txtStatus){
 
                 var data = response.data;
-                var html = "<table><tbody><tr><th></th>";
 
-                var i,key;
+                var html = "<h3>Week Wise Data</h3>";
+                html += "<div style='overflow-x: auto'><table><tbody><tr><th></th>";
+
+                var key;
                 for(key in data.week_wise_data.Sunday){
                     html += "<th>"+key+"</th>";
                 }
@@ -41,24 +43,68 @@
 
                 }
 
-                html +=  "</tbody></table>"
+                html +=  "</tbody></table></div>";
+
+                html += "<h3>Day Wise Best Time</h3>";
+
+                html += "<div style='overflow-x: auto'><table><tbody><tr>";
+
+                for(key in data.week_max_times){
+                    html += "<th>"+key+"</th>";
+                }
+
+                html += "</tr><tr>";
+
+                for(key in data.week_max_times){
+
+                    html += "<td>"+data.week_max_times[key]+"</td>";
+
+
+                }
+
+                html +=  "</tr></tbody></table></div>";
+
+                html +=  "<h3>Overall Best Time: "+data.all_max_time+"</h3>";
+                html +=  "<h3>Overall Best Day: "+data.max_day+"</h3>";
+
 
                 $("#best").html(html);
-                $("#best").css("display","inherit");
+                $("#data-loading").css("display","none");
+                $("#data").css("display","inherit");
 
 
             },
-            error : function(){
-                console.log("error",arguments);
+            error : function(response,txtStatus){
 
-            },
-            complete : function(){
-                console.log("complete",arguments);
+
+                var data = response;
+
+                if(txtStatus=="abort"){
+                    $("#data-loading").css("display","none");
+                    return;
+                }
+
+                if(data.status==401){
+                    $("#best").html("<h3>Unauthorized</h3");
+                }
+                else if(data.status==404){
+                    $("#best").html("<h3>It seems like the user has no followers.</h3>");
+                }
+                else if(data.status==500){
+                    $("#best").html("<h3>Something went wrong.</h3>");
+                }
+                else{
+                    $("#best").html("<h3>"+txtStatus+"</h3>");
+                }
+
+                $("#data-loading").css("display","none");
+                $("#data").css("display","inherit");
+
 
             }
         });
 
-        $.ajax({
+        var fetchProfileRequest = $.ajax({
             url : "/api/fetch-profile",
             method : "post",
             data : JSON.stringify({
@@ -71,22 +117,40 @@
                 var data = response.data;
 
 
-                $("#profile-img").attr("src",data.profile_image_url);
+                $("#profile-img").attr("src",data.profile_image_url_https.replace("_normal",""));
                 $("#name").text(data.name);
                 $("#screen-name").text("@"+data.screen_name);
 
-                $("#loading").css("display","none");
-                $("#data").css("display","inherit");
+                $("#profile-loading").css("display","none");
+                $(".profile").css("display","inherit");
 
 
 
             },
-            error : function(){
-                console.log("error",arguments);
+            error : function(response,txtStatus){
 
-            },
-            complete : function(){
-                console.log("complete",arguments);
+                fetchDataRequest.abort();
+                $("#data-loading").css("display","none");
+                $("#data").css("display","none");
+
+
+                var data = response;
+
+                if(data.status==401){
+                    $("#profile-loading").after("<h3>Unauthorized</h3>");
+                }
+                else if(data.status==404){
+                    $("#profile-loading").after("<h3>It seems like the user does not exist.</h3>");
+                }
+                else if(data.status==500){
+                    $("#profile-loading").after("<h3>Something went wrong.</h3>");
+                }
+                else{
+                    $("#profile-loading").after("<h3>"+txtStatus+"</h3>");
+                }
+
+                $("#profile-loading").css("display","none");
+
 
             }
         });
@@ -100,27 +164,40 @@
 <div class="container">
 
     <div class="row">
-        <div class="col-xs-offset-1 col-xs-10">
+        <div class="well well-lg col-lg-12 clearfix custom-panel">
 
-            <div class="well well-lg custom-panel">
 
-                <a class="btn btn-danger" id="profile-link">View Profile</a>
-                <a class="btn btn-danger" href="/web/home">Go back Home</a>
-                <h2 id="loading">Please wait loading results ...</h2>
+            <div class="row">
+                <div class="col-lg-2">
+                    <a class="btn btn-danger" id="profile-link">View Profile</a>
+                </div>
+                <div class="col-lg-2">
+                    <a class="btn btn-danger" href="/web/home">Go back Home</a>
+                </div>
+            </div>
 
-                <div id="data">
-                    <img class="img-rounded" id="profile-img" src="" >
-
+            <div class="row" style="margin-top: 2em">
+                <div class="colg-12" id="profile-loading">
+                    <h2 id="loading">Please wait loading profile ...</h2>
+                </div>
+                <div class="col-lg-6 profile">
+                    <img class="img-rounded" id="profile-img" src="" height="100px" width="100px">
+                </div>
+                <div class="col-lg-6 profile">
                     <h1 id="name"></h1>
                     <h3 id="screen-name"></h3>
-                    <div id="best"></div>
                 </div>
-
-
             </div>
 
 
-
+            <div class="row">
+                <div class="colg-12" id="data-loading">
+                    <h2 id="loading">Please wait loading result ...</h2>
+                </div>
+                <div class="col-lg-12" id="data">
+                    <div id="best"></div>
+                </div>
+            </div>
 
         </div>
     </div>

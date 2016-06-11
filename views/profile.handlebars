@@ -9,7 +9,7 @@
         $("#best-time-link").attr("href", "/web/best-time?credentialType="+credentialType+"&credential="+credential);
 
 
-        $.ajax({
+        var fetchProfileRequest = $.ajax({
             url : "/api/fetch-profile",
             method : "post",
             data : JSON.stringify({
@@ -21,22 +21,43 @@
 
                 var data = response.data;
 
-                console.log(data.profile_image_url.replace("_normal",""))
 
-                $("#profile-img").attr("src",data.profile_image_url.replace("_normal",""));
+                $("#profile-img").attr("src",data.profile_image_url_https.replace("_normal",""));
                 $("#name").text(data.name);
                 $("#screen-name").text("@"+data.screen_name);
                 $("#stats").html("<span style='font-weight: bold'>Tweets: </span>"+data.statuses_count+" <span style='font-weight: bold'>Following: </span>"+data.friends_count+" <span style='font-weight: bold'>Followers: </span>"+data.followers_count+" <span style='font-weight: bold'>Likes: </span>"+data.favourites_count);
 
-                $("#loading").css("display","none");
-                $("#profile").css("display","inherit");
-            },
-            error : function(){
-                console.log("error",arguments);
+
+                $("#profile-loading").css("display","none");
+                $(".profile").css("display","inherit");
+
+
 
             },
-            complete : function(){
-                console.log("complete",arguments);
+            error : function(response,txtStatus){
+
+                fetchDataRequest.abort();
+                $("#data-loading").css("display","none");
+                $("#data").css("display","none");
+
+
+                var data = response;
+
+                if(data.status==401){
+                    $("#profile-loading").after("<h3>Unauthorized</h3>");
+                }
+                else if(data.status==404){
+                    $("#profile-loading").after("<h3>It seems like the user does not exist.</h3>");
+                }
+                else if(data.status==500){
+                    $("#profile-loading").after("<h3>Something went wrong.</h3>");
+                }
+                else{
+                    $("#profile-loading").after("<h3>"+txtStatus+"</h3>");
+                }
+
+                $("#profile-loading").css("display","none");
+
 
             }
         });
@@ -50,29 +71,31 @@
 <div class="container">
 
     <div class="row">
-        <div class="col-xs-offset-2 col-xs-8">
+        <div class="well well-lg col-lg-12 clearfix custom-panel">
 
-            <div class="well well-lg custom-panel">
+            <div class="row">
+                <div class="col-lg-3">
+                    <a class="btn btn-danger"  id="best-time-link">Best time to tweet</a>
+                </div>
+                <div class="col-lg-2">
+                    <a class="btn btn-danger" href="/web/home">Go back Home</a>
+                </div>
+            </div>
 
-                <a class="btn btn-danger" id="best-time-link">Best time to tweet</a>
-                <a class="btn btn-danger" href="/web/home">Go back Home</a>
-
-
-                <h2 id="loading">Please wait loading results ...</h2>
-
-                <div id="profile">
-                    <img class="img-rounded" id="profile-img" src="" >
-
+            <div class="row" style="margin-top: 2em">
+                <div class="colg-12" id="profile-loading">
+                    <h2 id="loading">Please wait loading profile ...</h2>
+                </div>
+                <div class="col-lg-6 profile">
+                    <img class="img-rounded" id="profile-img" src="" height="300px" width="300px">
+                </div>
+                <div class="col-lg-6 profile">
                     <h1 id="name"></h1>
                     <h3 id="screen-name"></h3>
                     <h3 id="stats"></h3>
+
                 </div>
-
-
             </div>
-
-
-
 
         </div>
     </div>

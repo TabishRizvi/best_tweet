@@ -1,6 +1,4 @@
-/**
- * Created by tabishrizvi on 27/02/16.
- */
+/* Configuration file for app */
 
 
 module.exports = {

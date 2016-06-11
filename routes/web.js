@@ -1,3 +1,8 @@
+/**
+ *It declares web routes and their specific controllers
+ *
+ */
+
 var express = require('express'),
     controllers = require("../controllers");
 

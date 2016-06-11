@@ -34,8 +34,24 @@
     min-height : 50vh;
 
     margin: 2em 0 2em 0;
+
+    padding: 5em 5em 5em 5em;
 }
 
-#error-div,#profile,#data,#best{
+#error-div,.profile,#data{
     display: none;
+}
+
+table, td, th {
+    border: 1px solid #ddd;
+    text-align: left;
+}
+
+table {
+    border-collapse: collapse;
+    width: 100%;
+}
+
+th, td {
+    padding: 15px;
 }
